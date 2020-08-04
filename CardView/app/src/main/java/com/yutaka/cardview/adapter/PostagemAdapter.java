@@ -35,7 +35,7 @@ public class PostagemAdapter extends RecyclerView.Adapter<PostagemAdapter.MyView
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-        Postagem postagem = postagens.get(position);
+        Postagem postagem = postagens.get(position); 
 
         holder.textNome.setText(postagem.getNome());
         holder.textPostagem.setText(postagem.getPostagem());
