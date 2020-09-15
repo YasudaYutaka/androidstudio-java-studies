@@ -1,11 +1,14 @@
-package com.yutaka.organizzeclone;
+package com.yutaka.organizzeclone.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.FragmentSlide;
+import com.yutaka.organizzeclone.R;
 
 public class MainActivity extends IntroActivity {
 
@@ -41,5 +44,21 @@ public class MainActivity extends IntroActivity {
                 .build()
         );
 
+        addSlide(new FragmentSlide.Builder()
+                .background(android.R.color.white)
+                .fragment(R.layout.intro_cadastro)
+                .canGoForward(false)
+                .build()
+        );
+
     }
+
+    public void buttonEntrar(View view) {
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    public void buttonCadastrar(View view) {
+        startActivity(new Intent(this, CadastroActivity.class));
+    }
+
 }
