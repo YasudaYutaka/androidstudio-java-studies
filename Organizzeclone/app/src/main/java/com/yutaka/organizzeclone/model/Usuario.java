@@ -7,6 +7,7 @@ import com.yutaka.organizzeclone.config.ConfiguracaoFirebase;
 public class Usuario {
 
     private String nome, email, senha, idUsuario;
+    private Double receitaTotal = 0.00, despesaTotal = 0.00;
 
     public Usuario() {
     }
@@ -50,5 +51,21 @@ public class Usuario {
 
     public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public Double getReceitaTotal() {
+        return receitaTotal;
+    }
+
+    public void setReceitaTotal(Double receitaTotal) {
+        this.receitaTotal = receitaTotal;
+    }
+
+    public Double getDespesaTotal() {
+        return despesaTotal;
+    }
+
+    public void setDespesaTotal(Double despesaTotal) {
+        this.despesaTotal = despesaTotal;
     }
 }
