@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.yutaka.organizzeclone.R;
 import com.yutaka.organizzeclone.config.ConfiguracaoFirebase;
+import com.yutaka.organizzeclone.helper.Base64Custom;
 import com.yutaka.organizzeclone.model.Usuario;
 
 public class CadastroActivity extends AppCompatActivity {
@@ -78,9 +79,10 @@ public class CadastroActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()) {
-
+                    String idUsuario = Base64Custom.codificarBase64(usuario.getEmail());
+                    usuario.setIdUsuario(idUsuario);
+                    usuario.salvar();
                     finish();
-                    //Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar o usuário!", Toast.LENGTH_SHORT).show();
                 } else {
 
                     String excecao = "";
