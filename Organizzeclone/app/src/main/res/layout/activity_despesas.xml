@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ReceitasActivity">
+    tools:context=".activity.DespesasActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -95,6 +95,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabSalvar"
+        android:onClick="salvarDespesa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
