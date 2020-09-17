@@ -1,5 +1,6 @@
 package com.yutaka.organizzeclone.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -9,6 +10,8 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,11 +27,15 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.yutaka.organizzeclone.R;
+import com.yutaka.organizzeclone.adapter.AdapterMovimentacao;
 import com.yutaka.organizzeclone.config.ConfiguracaoFirebase;
 import com.yutaka.organizzeclone.helper.Base64Custom;
+import com.yutaka.organizzeclone.model.Movimentacao;
 import com.yutaka.organizzeclone.model.Usuario;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrincipalActivity extends AppCompatActivity {
 
@@ -41,6 +48,9 @@ public class PrincipalActivity extends AppCompatActivity {
     private Double despesaTotal = 0.00;
     private Double receitaTotal = 0.00;
     private Double resumoUsuario = 0.00;
+    private RecyclerView recyclerView;
+    private AdapterMovimentacao adapterMovimentacao;
+    private List<Movimentacao> movimentacoes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +63,16 @@ public class PrincipalActivity extends AppCompatActivity {
         textSaudacao = findViewById(R.id.textViewSaudacao);
         textSaldo = findViewById(R.id.textViewSaldo);
         calendarView = findViewById(R.id.calendarView);
+        recyclerView= findViewById(R.id.recyclerMovimentos);
         configuraCalendarView();
+
+        // Configurar Adapter
+        adapterMovimentacao = new AdapterMovimentacao(movimentacoes, this);
+        //Configurar RecyclerView
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapterMovimentacao);
 
         /*
         FloatingActionButton fab = findViewById(R.id.fab);
