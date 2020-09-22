@@ -1,8 +1,10 @@
-package com.yutaka.whatsappclone;
+package com.yutaka.whatsappclone.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.yutaka.whatsappclone.R;
 
 public class MainActivity extends AppCompatActivity {
 
