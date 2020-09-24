@@ -50,19 +50,20 @@
 
         <EditText
             android:id="@+id/editTextTextPersonName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Nome do usuário" />
+            android:hint="@string/nome_do_usuario_configuracao"
+            android:inputType="textPersonName" />
 
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:background="@drawable/ic_edit_green_24" />
+            android:background="@drawable/ic_edit_green_24"
+            android:contentDescription="@string/icone_editar_descricao" />
     </LinearLayout>
 
     <TextView
@@ -74,7 +75,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:gravity="center"
-        android:text="Esse não é seu nome de usuário nem sua senha. Esse nome ficará visível para seus contatos do WhatsApp"
+        android:text="@string/esse_nome_usuario_mensagem"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
