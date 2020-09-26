@@ -1,17 +1,28 @@
 package com.yutaka.whatsappclone.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.yutaka.whatsappclone.R;
 import com.yutaka.whatsappclone.helper.Permissao;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ConfiguracoesActivity extends AppCompatActivity {
 
@@ -19,6 +30,11 @@ public class ConfiguracoesActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA
     };
+
+    private ImageButton imageButtonCamera, imageButtonPhoto;
+    private CircleImageView circleImageViewProfilePicture;
+    private static final int SELECAO_CAMERA = 100;
+    private static final int SELECAO_GALERIA = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +44,72 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         // Validar permissões
         Permissao.validarPermissoes(permissoesNecessarias, this, 1);
 
+        imageButtonCamera = findViewById(R.id.imageButtonCamera);
+        imageButtonPhoto = findViewById(R.id.imageButtonPhoto);
+        circleImageViewProfilePicture = findViewById(R.id.circleImageViewProfilePicture);
+
         Toolbar toolbar = findViewById(R.id.toolbarPrincipal);
         toolbar.setTitle("Configurações");
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        imageButtonCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(i.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(i, SELECAO_CAMERA);
+                }
+
+            }
+        });
+
+        imageButtonPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                if(i.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(i, SELECAO_GALERIA);
+                }
+
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK) {
+            Bitmap imagem = null;
+
+            try {
+                switch (requestCode) {
+                    case SELECAO_CAMERA:
+                        imagem = (Bitmap) data.getExtras().get("data");
+                        break;
+                    case SELECAO_GALERIA:
+                        Uri localImagemSelecionada = data.getData();
+                        if(Build.VERSION.SDK_INT >= 29) {
+                            ImageDecoder.Source imageDecoder = ImageDecoder.createSource(getContentResolver(), localImagemSelecionada);
+                            imagem = ImageDecoder.decodeBitmap(imageDecoder);
+                        } else {
+                            imagem = MediaStore.Images.Media.getBitmap(getContentResolver(), localImagemSelecionada);
+                        }
+                        break;
+                }
+
+                if(imagem != null) {
+                    circleImageViewProfilePicture.setImageBitmap(imagem);
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
