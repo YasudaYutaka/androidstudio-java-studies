@@ -17,12 +17,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -32,6 +38,7 @@ import com.yutaka.whatsappclone.config.ConfiguracaoFirebase;
 import com.yutaka.whatsappclone.helper.Base64Custom;
 import com.yutaka.whatsappclone.helper.Permissao;
 import com.yutaka.whatsappclone.helper.UsuarioFirebase;
+import com.yutaka.whatsappclone.model.Usuario;
 
 import java.io.ByteArrayOutputStream;
 
@@ -46,10 +53,13 @@ public class ConfiguracoesActivity extends AppCompatActivity {
 
     private ImageButton imageButtonCamera, imageButtonPhoto;
     private CircleImageView circleImageViewProfilePicture;
+    private EditText editPerfilNome;
+    private ImageView imageAtualizarNome;
     private static final int SELECAO_CAMERA = 100;
     private static final int SELECAO_GALERIA = 200;
     private StorageReference storageReference;
     private String identificadorUsuario;
+    private Usuario usuarioLogado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +69,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         // Configurações Iniciais
         storageReference = ConfiguracaoFirebase.getFirebaseStorage();
         identificadorUsuario = UsuarioFirebase.getIdentificadorUsuario();
+        usuarioLogado = UsuarioFirebase.getDadosUsuarioLogado();
 
         // Validar permissões
         Permissao.validarPermissoes(permissoesNecessarias, this, 1);
@@ -66,12 +77,25 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         imageButtonCamera = findViewById(R.id.imageButtonCamera);
         imageButtonPhoto = findViewById(R.id.imageButtonPhoto);
         circleImageViewProfilePicture = findViewById(R.id.circleImageViewProfilePicture);
+        editPerfilNome = findViewById(R.id.editPerfilNome);
+        imageAtualizarNome = findViewById(R.id.imageAtualizarNome);
 
         Toolbar toolbar = findViewById(R.id.toolbarPrincipal);
         toolbar.setTitle("Configurações");
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Recuperar dados usuário
+        FirebaseUser usuario = UsuarioFirebase.getUsuarioAtual();
+        Uri url = usuario.getPhotoUrl();
+        if(url != null) {
+            Glide.with(ConfiguracoesActivity.this).load(url).into(circleImageViewProfilePicture);
+        } else {
+            circleImageViewProfilePicture.setImageResource(R.drawable.padrao);
+        }
+
+        editPerfilNome.setText(usuario.getDisplayName());
 
         imageButtonCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +118,19 @@ public class ConfiguracoesActivity extends AppCompatActivity {
                     startActivityForResult(i, SELECAO_GALERIA);
                 }
 
+            }
+        });
+
+        imageAtualizarNome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String nome = editPerfilNome.getText().toString();
+                boolean retorno = UsuarioFirebase.atualizarNomeUsuario(nome);
+                if(retorno) {
+                    usuarioLogado.setNome(nome);
+                    usuarioLogado.atualizar();
+                    Toast.makeText(ConfiguracoesActivity.this, "Nome atualizado com sucesso", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -131,7 +168,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
                     byte[] dadosImagem = byteArrayOutputStream.toByteArray();
 
                     // Salvar no Firebase
-                    StorageReference imagemRef = storageReference.child("imagens").child("perfil").child(identificadorUsuario).child("perfil.jpeg");
+                    final StorageReference imagemRef = storageReference.child("imagens").child("perfil").child(identificadorUsuario).child("perfil.jpeg");
 
                     UploadTask uploadTask = imagemRef.putBytes(dadosImagem);
                     uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -143,6 +180,14 @@ public class ConfiguracoesActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             Toast.makeText(ConfiguracoesActivity.this, "Sucesso ao fazer o upload da imagem", Toast.LENGTH_SHORT).show();
+
+                            imagemRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    Uri url = task.getResult();
+                                    atualizaFotoUsuario(url);
+                                }
+                            });
                         }
                     });
                 }
@@ -180,6 +225,15 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
 
+    }
+
+    public void atualizaFotoUsuario(Uri url) {
+        boolean retorno = UsuarioFirebase.atualizarFotoUsuario(url);
+        if(retorno) {
+            usuarioLogado.setFoto(url.toString());
+            usuarioLogado.atualizar();
+            Toast.makeText(ConfiguracoesActivity.this, "Sucesso ao atualizar a foto de perfil", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

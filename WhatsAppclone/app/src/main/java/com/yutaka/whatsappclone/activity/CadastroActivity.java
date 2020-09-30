@@ -15,10 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
-import com.google.firebase.database.DatabaseReference;
 import com.yutaka.whatsappclone.R;
 import com.yutaka.whatsappclone.config.ConfiguracaoFirebase;
 import com.yutaka.whatsappclone.helper.Base64Custom;
+import com.yutaka.whatsappclone.helper.UsuarioFirebase;
 import com.yutaka.whatsappclone.model.Usuario;
 
 public class CadastroActivity extends AppCompatActivity {
@@ -31,7 +31,7 @@ public class CadastroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro);
 
-        campoNome  = findViewById(R.id.editNome);
+        campoNome  = findViewById(R.id.editPerfilNome);
         campoEmail = findViewById(R.id.editEmail);
         campoSenha = findViewById(R.id.editSenha);
 
@@ -57,6 +57,7 @@ public class CadastroActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar", Toast.LENGTH_SHORT).show();
+                    UsuarioFirebase.atualizarNomeUsuario(usuario.getNome());
                     finish();
                 } else {
                     String excecao = "";
